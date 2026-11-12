@@ -1,0 +1,1 @@
+# kalimat-langsung-tidak-langsung
