@@ -1,0 +1,1065 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Petualangan Kalimat PID - Bahasa Indonesia Kelas 6</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&family=Quicksand:wght@600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            blue: '#2563EB',
+                            purple: '#7C3AED',
+                            yellow: '#D97706',
+                            green: '#059669',
+                            red: '#DC2626'
+                        }
+                    },
+                    fontFamily: {
+                        fredoka: ['Fredoka', 'sans-serif'],
+                        quicksand: ['Quicksand', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            font-family: 'Quicksand', sans-serif;
+            background: linear-gradient(135deg, #dbeafe 0%, #f3e8ff 100%);
+            min-height: 100vh;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+        h1, h2, h3, .font-heading {
+            font-family: 'Fredoka', sans-serif;
+        }
+        
+        /* PID Optimization: Extra Large Touch Targets & Visual Feedback */
+        .draggable-item {
+            touch-action: none;
+            cursor: pointer;
+            transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.2s;
+        }
+        .draggable-item:active, .draggable-item.touch-active {
+            transform: scale(1.08);
+            box-shadow: 0 10px 25px -5px rgba(59, 130, 246, 0.5);
+        }
+        
+        .drop-zone {
+            transition: all 0.25s ease;
+        }
+        .drop-zone.drag-over {
+            background-color: #dbeafe !important;
+            border-color: #2563eb !important;
+            transform: scale(1.02);
+        }
+
+        /* Large Touch Pulse Animation */
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        .animate-pulse-ring {
+            animation: pulse-ring 0.3s ease-out;
+        }
+
+        /* Custom PID Scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #e2e8f0;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen text-gray-800">
+
+    <!-- Header Navigation (Optimized for Class Displays) -->
+    <header class="bg-white/90 backdrop-blur-md border-b-2 border-blue-200 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center space-x-4">
+                <div class="bg-gradient-to-tr from-blue-600 to-indigo-600 text-white p-3.5 rounded-2xl shadow-md text-2xl">
+                    <i class="fa-solid fa-chalkboard-user"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-black text-gray-800 leading-tight tracking-wide">Petualangan Kalimat PID</h1>
+                    <span class="text-sm font-bold text-indigo-600 bg-indigo-50 px-3 py-0.5 rounded-full border border-indigo-100">
+                        Bahasa Indonesia - Kelas 6 SD (Papan Interaktif Digital)
+                    </span>
+                </div>
+            </div>
+
+            <!-- Controls / Stats Header -->
+            <div id="game-stats-header" class="hidden flex items-center space-x-6">
+                <div class="flex items-center space-x-2 bg-amber-100/80 px-4 py-2 rounded-2xl border-2 border-amber-300 shadow-sm">
+                    <i class="fa-solid fa-star text-amber-500 text-xl"></i>
+                    <span id="score-text" class="font-black text-amber-800 text-xl">0</span>
+                </div>
+                <div class="flex items-center space-x-2 bg-rose-100/80 px-4 py-2 rounded-2xl border-2 border-rose-300 shadow-sm">
+                    <i class="fa-solid fa-heart text-rose-500 text-xl"></i>
+                    <span id="lives-text" class="font-black text-rose-800 text-xl">3</span>
+                </div>
+                <button id="audio-toggle" class="p-3 text-gray-700 hover:text-indigo-600 bg-gray-100 rounded-2xl border-2 border-gray-200 active:scale-95 transition text-xl">
+                    <i class="fa-solid fa-volume-high" id="audio-icon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <main class="flex-grow max-w-6xl w-full mx-auto p-4 md:p-6 flex flex-col justify-center">
+
+        <!-- SCREEN 1: WELCOME & MATERIAL SUMMARY -->
+        <section id="screen-welcome" class="bg-white rounded-3xl shadow-2xl p-6 md:p-10 border-4 border-blue-100">
+            <div class="text-center max-w-3xl mx-auto mb-8">
+                <span class="bg-indigo-600 text-white font-extrabold px-6 py-2 rounded-full text-base inline-block mb-4 shadow-md tracking-wide">
+                    Modul Papan Interaktif Digital (PID)
+                </span>
+                <h2 class="text-3xl md:text-5xl font-extrabold text-gray-900 mb-4 leading-tight">Kalimat Langsung & Tidak Langsung</h2>
+                <p class="text-lg md:text-xl font-semibold text-gray-600">Selesaikan 28 soal latihan interaktif! Geser (Drag) atau Sentuh (Tap) jawaban yang benar ke papan.</p>
+            </div>
+
+            <!-- Rangkuman Materi Ringkas (Tampilan Besar PID) -->
+            <div class="bg-gradient-to-r from-blue-50 to-indigo-50 border-2 border-blue-200 rounded-3xl p-6 mb-8 max-h-[420px] overflow-y-auto shadow-inner">
+                <h3 class="font-bold text-blue-900 text-2xl mb-4 flex items-center">
+                    <i class="fa-solid fa-lightbulb text-amber-500 mr-3 text-3xl"></i> Ringkasan Ringkas Materi:
+                </h3>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-base">
+                    <!-- Card Kalimat Langsung -->
+                    <div class="bg-white p-6 rounded-2xl border-2 border-blue-200 shadow-sm space-y-3">
+                        <h4 class="font-extrabold text-indigo-700 text-xl flex items-center">
+                            <i class="fa-solid fa-quote-left mr-2"></i> 1. Kalimat Langsung
+                        </h4>
+                        <p class="text-gray-700 font-medium">Menyampaikan ucapan seseorang sama persis seperti diucapkan.</p>
+                        <ul class="list-disc list-inside space-y-1.5 text-gray-800 font-semibold text-sm">
+                            <li>Menggunakan tanda petik dua (<span class="text-indigo-600 font-bold">“…”</span>).</li>
+                            <li>Kata kunci: <em>berkata, bertanya, menjawab, ujar</em>.</li>
+                            <li>Awal petikan menggunakan <strong>Huruf Kapital</strong>.</li>
+                        </ul>
+                        <div class="mt-3 text-sm bg-indigo-50/70 p-3 rounded-xl border border-indigo-100 font-semibold text-indigo-900">
+                            Contoh: Ibu berkata, <span class="text-indigo-700">“Kamu harus rajin belajar.”</span>
+                        </div>
+                    </div>
+
+                    <!-- Card Kalimat Tidak Langsung -->
+                    <div class="bg-white p-6 rounded-2xl border-2 border-purple-200 shadow-sm space-y-3">
+                        <h4 class="font-extrabold text-purple-700 text-xl flex items-center">
+                            <i class="fa-solid fa-comment-dots mr-2"></i> 2. Kalimat Tidak Langsung
+                        </h4>
+                        <p class="text-gray-700 font-medium">Menceritakan kembali isi ucapan tanpa kutipan langsung.</p>
+                        <ul class="list-disc list-inside space-y-1.5 text-gray-800 font-semibold text-sm">
+                            <li><strong>Tidak</strong> menggunakan tanda petik dua.</li>
+                            <li>Sering menggunakan kata penghubung <span class="text-purple-600 font-bold">bahwa</span>.</li>
+                            <li>Kata ganti orang berubah (<em>Saya &rarr; dia, Kami &rarr; mereka</em>).</li>
+                        </ul>
+                        <div class="mt-3 text-sm bg-purple-50/70 p-3 rounded-xl border border-purple-100 font-semibold text-purple-900">
+                            Contoh: Ibu berkata <span class="text-purple-700">bahwa saya</span> harus rajin belajar.
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Start Game Actions -->
+            <div class="flex justify-center">
+                <button id="btn-start" class="w-full md:w-auto bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-extrabold text-2xl px-12 py-5 rounded-3xl shadow-xl hover:shadow-2xl active:scale-95 transition transform border-4 border-white">
+                    <i class="fa-solid fa-circle-play mr-3"></i> Mulai Main (28 Soal PID)
+                </button>
+            </div>
+        </section>
+
+        <!-- SCREEN 2: GAMEPLAY INTERFACE (PID OPTIMIZED) -->
+        <section id="screen-game" class="hidden flex flex-col space-y-6">
+            
+            <!-- Progress Bar Card -->
+            <div class="bg-white rounded-2xl p-4 shadow-md border-2 border-gray-200 flex items-center space-x-6">
+                <span id="question-number" class="font-black text-indigo-700 text-lg md:text-xl whitespace-nowrap">Soal 1 / 28</span>
+                <div class="w-full bg-gray-200 rounded-full h-4 overflow-hidden border border-gray-300">
+                    <div id="progress-bar" class="bg-gradient-to-r from-blue-600 to-indigo-600 h-full w-0 transition-all duration-300"></div>
+                </div>
+                <span id="badge-category" class="text-sm md:text-base font-extrabold bg-indigo-100 text-indigo-800 px-4 py-1.5 rounded-full whitespace-nowrap border border-indigo-200">
+                    Konsep
+                </span>
+            </div>
+
+            <!-- Question Card -->
+            <div class="bg-white rounded-3xl shadow-2xl p-6 md:p-8 border-4 border-blue-100 flex flex-col space-y-6">
+                <!-- Instruction Header -->
+                <div>
+                    <h3 id="question-instruction" class="text-base md:text-lg font-extrabold text-indigo-600 uppercase tracking-wide mb-2">Instruksi Soal</h3>
+                    <p id="question-text" class="text-xl md:text-2xl font-extrabold text-gray-800 leading-relaxed bg-slate-50 p-4 rounded-2xl border border-gray-200">
+                        Memuat pertanyaan...
+                    </p>
+                </div>
+
+                <!-- Interactive Drag & Drop Area -->
+                <div id="interactive-area" class="space-y-6">
+                    
+                    <!-- Drop Zone Target Container -->
+                    <div id="drop-zones-container" class="space-y-4">
+                        <!-- Dynamic Drop Zones Rendered Here -->
+                    </div>
+
+                    <!-- Draggable Options Pool Container -->
+                    <div class="bg-indigo-50/60 p-5 rounded-3xl border-2 border-dashed border-indigo-300 shadow-inner">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="text-sm md:text-base font-extrabold text-indigo-900 flex items-center">
+                                <i class="fa-solid fa-hand-pointer mr-2 text-indigo-600"></i> Pilihan Jawaban (Geser / Ketuk Pilihan di Bawah):
+                            </span>
+                            <button id="btn-reset-option" class="text-xs md:text-sm font-bold text-slate-600 hover:text-indigo-700 bg-white px-3 py-1.5 rounded-xl border border-slate-300 shadow-sm active:scale-95">
+                                <i class="fa-solid fa-rotate-left mr-1"></i> Reset Jawaban
+                            </button>
+                        </div>
+                        <div id="drag-options-pool" class="flex flex-wrap gap-4 min-h-[80px] items-center justify-center p-2">
+                            <!-- Dynamic Draggable Items Rendered Here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Instant Feedback Notification Box -->
+                <div id="feedback-box" class="hidden p-5 rounded-3xl flex items-center justify-between border-4 shadow-lg transition-all">
+                    <div class="flex items-center space-x-4">
+                        <div id="feedback-icon-bg" class="w-14 h-14 rounded-2xl flex items-center justify-center text-white text-3xl font-black shadow-md">
+                            <i id="feedback-icon" class="fa-solid fa-check"></i>
+                        </div>
+                        <div>
+                            <p id="feedback-title" class="font-extrabold text-xl md:text-2xl">Benar Sekali!</p>
+                            <p id="feedback-desc" class="text-base md:text-lg font-bold opacity-90">Penjelasan jawaban.</p>
+                        </div>
+                    </div>
+                    <button id="btn-next" class="bg-white text-gray-900 font-extrabold text-lg px-8 py-4 rounded-2xl shadow-lg border-2 border-gray-300 hover:bg-gray-100 active:scale-95 transition flex items-center space-x-2">
+                        <span>Lanjut Soal</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SCREEN 3: GAME OVER / RESULT -->
+        <section id="screen-result" class="hidden bg-white rounded-3xl shadow-2xl p-8 md:p-12 text-center border-4 border-blue-100 max-w-2xl mx-auto">
+            <div id="result-icon-container" class="w-28 h-28 rounded-full mx-auto flex items-center justify-center text-5xl mb-6 bg-amber-100 text-amber-500 shadow-xl border-4 border-amber-300">
+                <i class="fa-solid fa-trophy"></i>
+            </div>
+            
+            <h2 id="result-title" class="text-4xl font-black text-gray-900 mb-2">Hebat Sekali!</h2>
+            <p id="result-subtitle" class="text-lg font-bold text-gray-600 mb-8">Kamu telah menyelesaikan 28 soal latihan papan interaktif.</p>
+
+            <!-- Star Rating Badges -->
+            <div class="flex justify-center space-x-3 text-5xl text-amber-400 mb-8">
+                <i class="fa-solid fa-star star-1"></i>
+                <i class="fa-solid fa-star star-2"></i>
+                <i class="fa-solid fa-star star-3"></i>
+            </div>
+
+            <!-- Score Summary Card -->
+            <div class="bg-slate-50 rounded-3xl p-6 border-2 border-gray-200 grid grid-cols-2 gap-6 mb-8">
+                <div class="p-4 bg-white rounded-2xl shadow-sm border border-gray-200">
+                    <span class="text-sm font-bold text-gray-500 block">Total Skor</span>
+                    <span id="final-score" class="text-4xl font-black text-indigo-600">280</span>
+                </div>
+                <div class="p-4 bg-white rounded-2xl shadow-sm border border-gray-200">
+                    <span class="text-sm font-bold text-gray-500 block">Jawaban Benar</span>
+                    <span id="final-accuracy" class="text-4xl font-black text-emerald-600">28 / 28</span>
+                </div>
+            </div>
+
+            <div class="flex justify-center">
+                <button id="btn-restart" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-extrabold text-xl py-4 px-10 rounded-2xl shadow-xl active:scale-95 transition">
+                    <i class="fa-solid fa-rotate-right mr-2"></i> Main Ulang Permainan
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-4 text-center text-sm font-bold text-gray-600 border-t border-gray-200/60 mt-auto">
+        Media Interaktif Papan Digital &bull; Bahasa Indonesia Kelas 6 SD (Materi Kalimat Langsung & Tidak Langsung)
+    </footer>
+
+    <!-- GAME ENGINE & DATA SCRIPT -->
+    <script>
+        /* ==========================================================================
+           1. AUDIO SYNTHESIZER (Web Audio API - No External Sound Dependency)
+           ========================================================================== */
+        class SoundFX {
+            constructor() {
+                this.ctx = null;
+                this.muted = false;
+            }
+
+            init() {
+                if (!this.ctx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    this.ctx = new AudioContext();
+                }
+            }
+
+            playCorrect() {
+                if (this.muted) return;
+                this.init();
+                const now = this.ctx.currentTime;
+
+                const osc1 = this.ctx.createOscillator();
+                const osc2 = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc1.type = 'sine';
+                osc2.type = 'triangle';
+
+                osc1.frequency.setValueAtTime(523.25, now); // C5
+                osc1.frequency.exponentialRampToValueAtTime(783.99, now + 0.15); // G5
+
+                osc2.frequency.setValueAtTime(659.25, now); // E5
+                osc2.frequency.exponentialRampToValueAtTime(1046.50, now + 0.15); // C6
+
+                gain.gain.setValueAtTime(0.35, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+
+                osc1.connect(gain);
+                osc2.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc1.start(now);
+                osc2.start(now);
+                osc1.stop(now + 0.35);
+                osc2.stop(now + 0.35);
+            }
+
+            playWrong() {
+                if (this.muted) return;
+                this.init();
+                const now = this.ctx.currentTime;
+
+                const osc = this.ctx.createOscillator();
+                const gain = this.ctx.createGain();
+
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(180, now);
+                osc.frequency.linearRampToValueAtTime(110, now + 0.25);
+
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+
+                osc.connect(gain);
+                gain.connect(this.ctx.destination);
+
+                osc.start(now);
+                osc.stop(now + 0.25);
+            }
+
+            playWin() {
+                if (this.muted) return;
+                this.init();
+                const notes = [523.25, 659.25, 783.99, 1046.50];
+                notes.forEach((freq, idx) => {
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    const now = this.ctx.currentTime + (idx * 0.12);
+
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(freq, now);
+
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+
+                    osc.start(now);
+                    osc.stop(now + 0.3);
+                });
+            }
+        }
+
+        const soundFX = new SoundFX();
+
+        /* ==========================================================================
+           2. QUESTION DATABASE (28 Questions for PID Interactive Board)
+           ========================================================================== */
+        const questionBank = [
+            // --- KELOMPOK 1: KONSEP DASAR & CIRI-CIRI (Soal 1 - 7) ---
+            {
+                id: 1,
+                category: "Konsep Dasar",
+                instruction: "Kelompokkan jenis kalimat berikut sesuai dengan pengertiaannya!",
+                type: "classify",
+                text: "Pasangkan jenis kalimat dengan ciri utamanya:",
+                zones: [
+                    { id: "z1", label: "Menggunakan tanda petik dua (“…”)", answer: "Kalimat Langsung" },
+                    { id: "z2", label: "Sering menggunakan kata hubung 'bahwa'", answer: "Kalimat Tidak Langsung" }
+                ],
+                options: ["Kalimat Langsung", "Kalimat Tidak Langsung"]
+            },
+            {
+                id: 2,
+                category: "Ciri-Ciri Kalimat",
+                instruction: "Tentukan tanda baca wajib pada Kalimat Langsung!",
+                type: "fill_single",
+                text: "Kalimat langsung selalu mengapit petikan ucapan menggunakan tanda [ target ].",
+                zones: [
+                    { id: "z1", label: "[ Tanda Baca ]", answer: "Petik Dua (“…”)" }
+                ],
+                options: ["Petik Dua (“…”)", "Tanya (?)", "Seru (!)", "Koma (,)"]
+            },
+            {
+                id: 3,
+                category: "Konsep Dasar",
+                instruction: "Lengkapi pengertian Kalimat Tidak Langsung!",
+                type: "fill_single",
+                text: "Kalimat tidak langsung menyampaikan kembali isi ucapan seseorang [ target ] mengutip ucapan secara langsung.",
+                zones: [
+                    { id: "z1", label: "[ Kata Kunci ]", answer: "tanpa" }
+                ],
+                options: ["tanpa", "dengan", "harus", "selalu"]
+            },
+            {
+                id: 4,
+                category: "Ciri Huruf",
+                instruction: "Penulisan huruf pertama pada awal petikan langsung!",
+                type: "fill_single",
+                text: "Huruf pertama pada awal petikan kalimat langsung harus ditulis menggunakan huruf [ target ].",
+                zones: [
+                    { id: "z1", label: "[ Jenis Huruf ]", answer: "Kapital" }
+                ],
+                options: ["Kapital", "Kecil", "Miring", "Tebal"]
+            },
+            {
+                id: 5,
+                category: "Kata Pengiring",
+                instruction: "Tentukan jenis kata pengiring kalimat berikut!",
+                type: "classify",
+                text: "Pasangkan kata penyambung/pengiring berikut sesuai jenis kalimatnya:",
+                zones: [
+                    { id: "z1", label: "Kata penghubung Kalimat Tidak Langsung", answer: "bahwa" },
+                    { id: "z2", label: "Kata pengiring Kalimat Langsung", answer: "berkata" }
+                ],
+                options: ["bahwa", "berkata"]
+            },
+            {
+                id: 6,
+                category: "Tanda Baca",
+                instruction: "Tentukan keberadaan tanda petik dua (“…”)",
+                type: "fill_single",
+                text: "Kalimat tidak langsung [ target ] menggunakan tanda petik dua.",
+                zones: [
+                    { id: "z1", label: "[ Keberadaan Petik ]", answer: "tidak" }
+                ],
+                options: ["tidak", "selalu", "wajib", "pasti"]
+            },
+            {
+                id: 7,
+                category: "Kata Kerja Pengiring",
+                instruction: "Pilih kata kerja pengiring yang biasa digunakan pada kalimat langsung!",
+                type: "fill_single",
+                text: "Selain kata 'berkata', kalimat langsung biasanya juga menggunakan kata pengiring [ target ].",
+                zones: [
+                    { id: "z1", label: "[ Kata Kerja ]", answer: "menjawab" }
+                ],
+                options: ["menjawab", "sehingga", "tetapi", "kemudian"]
+            },
+
+            // --- KELOMPOK 2: ATURAN TATA CARA & KATA GANTI (Soal 8 - 14) ---
+            {
+                id: 8,
+                category: "Perubahan Kata Ganti",
+                instruction: "Aturan perubahan kata ganti tunggal!",
+                type: "classify",
+                text: "Tarik kata ganti tidak langsung yang sesuai:",
+                zones: [
+                    { id: "z1", label: "Kata 'Saya' berubah menjadi", answer: "dia" },
+                    { id: "z2", label: "Kata 'Kami' berubah menjadi", answer: "mereka" }
+                ],
+                options: ["dia", "mereka"]
+            },
+            {
+                id: 9,
+                category: "Tata Cara Mengubah",
+                instruction: "Langkah utama mengubah Kalimat Langsung ke Tidak Langsung!",
+                type: "fill_single",
+                text: "Langkah pertama yang harus dilakukan adalah [ target ] tanda petik dua.",
+                zones: [
+                    { id: "z1", label: "[ Langkah 1 ]", answer: "menghilangkan" }
+                ],
+                options: ["menghilangkan", "menambahkan", "memperbesar", "mengulang"]
+            },
+            {
+                id: 10,
+                category: "Tata Cara Mengubah",
+                instruction: "Langkah utama mengubah Kalimat Tidak Langsung ke Langsung!",
+                type: "fill_single",
+                text: "Saat mengubah menjadi kalimat langsung, kita harus [ target ] kata 'bahwa'.",
+                zones: [
+                    { id: "z1", label: "[ Langkah ]", answer: "menghilangkan" }
+                ],
+                options: ["menghilangkan", "menambahkan", "mengisikan", "menebalkan"]
+            },
+            {
+                id: 11,
+                category: "Perubahan Kata Ganti",
+                instruction: "Pasangkan perubahan kata ganti 'Aku'!",
+                type: "fill_single",
+                text: "Kata ganti 'Aku' dalam kalimat langsung berubah menjadi [ target ] dalam kalimat tidak langsung.",
+                zones: [
+                    { id: "z1", label: "[ Kata Ganti ]", answer: "dia" }
+                ],
+                options: ["dia", "mereka", "kita", "kamu"]
+            },
+            {
+                id: 12,
+                category: "Penyesuaian Makna",
+                instruction: "Prinsip utama dalam mengubah kalimat!",
+                type: "fill_single",
+                text: "Dalam mengubah bentuk kalimat, susunan kalimat disesuaikan agar [ target ] kalimat tetap sama.",
+                zones: [
+                    { id: "z1", label: "[ Prinsip Utama ]", answer: "makna" }
+                ],
+                options: ["makna", "panjang", "huruf", "jumlah kata"]
+            },
+            {
+                id: 13,
+                category: "Kata Ganti Hormat",
+                instruction: "Perubahan kata ganti untuk orang tua/yang dihormati!",
+                type: "fill_single",
+                text: "Kata 'beliau' pada kalimat tidak langsung dapat diubah menjadi [ target ] pada kalimat langsung.",
+                zones: [
+                    { id: "z1", label: "[ Kata Ganti Direct ]", answer: "“Saya" }
+                ],
+                options: ["“Saya", "“Mereka", "“Dia", "“Kamu"]
+            },
+            {
+                id: 14,
+                category: "Perubahan Kata Ganti Jamak",
+                instruction: "Aturan perubahan kata ganti 'Kami'!",
+                type: "fill_single",
+                text: "Jika sekelompok orang berbicara ('Kami...'), maka pada kalimat tidak langsung berubah menjadi [ target ].",
+                zones: [
+                    { id: "z1", label: "[ Kata Ganti Jamak ]", answer: "mereka" }
+                ],
+                options: ["mereka", "dia", "saya", "beliau"]
+            },
+
+            // --- KELOMPOK 3: PRAKTIK LANGSUNG -> TIDAK LANGSUNG (Soal 15 - 21) ---
+            {
+                id: 15,
+                category: "Praktik Mengubah",
+                instruction: "Ubah kalimat langsung berikut menjadi kalimat tidak langsung!",
+                type: "sentence_builder",
+                text: "Kalimat Langsung: Rina berkata, “Saya suka membaca.”",
+                zones: [
+                    { id: "z1", label: "Bentuk Tidak Langsung:", prefix: "Rina berkata bahwa", suffix: "suka membaca.", answer: "dia" }
+                ],
+                options: ["dia", "saya", "kamu", "mereka"]
+            },
+            {
+                id: 16,
+                category: "Praktik Mengubah",
+                instruction: "Lengkapi kalimat tidak langsung dari ucapan Ayah!",
+                type: "sentence_builder",
+                text: "Kalimat Langsung: Ayah berkata, “Saya akan memasak.”",
+                zones: [
+                    { id: "z1", label: "Bentuk Tidak Langsung:", prefix: "Ayah berkata", suffix: "dia akan memasak.", answer: "bahwa" }
+                ],
+                options: ["bahwa", "sebab", "agar", "supaya"]
+            },
+            {
+                id: 17,
+                category: "Praktik Mengubah",
+                instruction: "Ubah kalimat ucapan Guru menjadi kalimat tidak langsung!",
+                type: "sentence_builder",
+                text: "Kalimat Langsung: Guru berkata, “Membaca itu penting.”",
+                zones: [
+                    { id: "z1", label: "Bentuk Tidak Langsung:", prefix: "Guru berkata bahwa", suffix: "itu penting.", answer: "membaca" }
+                ],
+                options: ["membaca", "menulis", "belajar", "sekolah"]
+            },
+            {
+                id: 18,
+                category: "Praktik Mengubah",
+                instruction: "Lengkapi kata ganti untuk ucapan Siti!",
+                type: "sentence_builder",
+                text: "Kalimat Langsung: Siti berkata, “Saya ingin menjadi dokter.”",
+                zones: [
+                    { id: "z1", label: "Bentuk Tidak Langsung:", prefix: "Siti berkata bahwa", suffix: "ingin menjadi dokter.", answer: "dia" }
+                ],
+                options: ["dia", "saya", "kamu", "mereka"]
+            },
+            {
+                id: 19,
+                category: "Praktik Mengubah",
+                instruction: "Ubah ucapan kelompok murid menjadi tidak langsung!",
+                type: "sentence_builder",
+                text: "Kalimat Langsung: Murid-murid berkata, “Kami akan belajar sungguh-sungguh.”",
+                zones: [
+                    { id: "z1", label: "Bentuk Tidak Langsung:", prefix: "Murid-murid berkata bahwa", suffix: "akan belajar sungguh-sungguh.", answer: "mereka" }
+                ],
+                options: ["mereka", "dia", "saya", "kami"]
+            },
+            {
+                id: 20,
+                category: "Praktik Mengubah",
+                instruction: "Ubah kalimat langsung berikut!",
+                type: "sentence_builder",
+                text: "Kalimat Langsung: Andi berkata, “Aku sudah mengerjakan tugas.”",
+                zones: [
+                    { id: "z1", label: "Bentuk Tidak Langsung:", prefix: "Andi berkata bahwa", suffix: "sudah mengerjakan tugas.", answer: "dia" }
+                ],
+                options: ["dia", "aku", "kamu", "mereka"]
+            },
+            {
+                id: 21,
+                category: "Praktik Mengubah",
+                instruction: "Lengkapi kata hubung yang tepat!",
+                type: "sentence_builder",
+                text: "Kalimat Langsung: Ibu menjawab, “Makanan sudah siap.”",
+                zones: [
+                    { id: "z1", label: "Bentuk Tidak Langsung:", prefix: "Ibu menjawab", suffix: "makanan sudah siap.", answer: "bahwa" }
+                ],
+                options: ["bahwa", "jika", "karena", "sehingga"]
+            },
+
+            // --- KELOMPOK 4: PRAKTIK TIDAK LANGSUNG -> LANGSUNG (Soal 22 - 28) ---
+            {
+                id: 22,
+                category: "Praktik Mengubah",
+                instruction: "Ubah kalimat tidak langsung menjadi kalimat langsung!",
+                type: "sentence_builder",
+                text: "Kalimat Tidak Langsung: Rina berkata bahwa dia suka menggambar.",
+                zones: [
+                    { id: "z1", label: "Bentuk Langsung:", prefix: "Rina berkata,", suffix: "suka menggambar.”", answer: "“Saya" }
+                ],
+                options: ["“Saya", "“Dia", "Bahwa dia", "Saya"]
+            },
+            {
+                id: 23,
+                category: "Praktik Mengubah",
+                instruction: "Lengkapi ucapan langsung dari Budi!",
+                type: "sentence_builder",
+                text: "Kalimat Tidak Langsung: Budi berkata bahwa dia ingin menjadi atlet.",
+                zones: [
+                    { id: "z1", label: "Bentuk Langsung:", prefix: "Budi berkata,", suffix: "ingin menjadi atlet.”", answer: "“Saya" }
+                ],
+                options: ["“Saya", "“Dia", "Budi", "Bahwa"]
+            },
+            {
+                id: 24,
+                category: "Praktik Mengubah",
+                instruction: "Ubah kalimat ucapan Ibu menjadi petikan langsung!",
+                type: "sentence_builder",
+                text: "Kalimat Tidak Langsung: Ibu berkata bahwa beliau akan memasak.",
+                zones: [
+                    { id: "z1", label: "Bentuk Langsung:", prefix: "Ibu berkata,", suffix: "akan memasak.”", answer: "“Saya" }
+                ],
+                options: ["“Saya", "“Beliau", "Bahwa ibu", "“Kami"]
+            },
+            {
+                id: 25,
+                category: "Praktik Mengubah",
+                instruction: "Lengkapi kalimat langsung dari Siti!",
+                type: "sentence_builder",
+                text: "Kalimat Tidak Langsung: Siti berkata bahwa dia rajin membaca.",
+                zones: [
+                    { id: "z1", label: "Bentuk Langsung:", prefix: "Siti berkata,", suffix: "rajin membaca.”", answer: "“Saya" }
+                ],
+                options: ["“Saya", "“Dia", "Siti", "Bahwa"]
+            },
+            {
+                id: 26,
+                category: "Praktik Mengubah",
+                instruction: "Ubah kalimat tidak langsung menjadi petikan langsung!",
+                type: "sentence_builder",
+                text: "Kalimat Tidak Langsung: Dodi berkata bahwa dia akan datang esok hari.",
+                zones: [
+                    { id: "z1", label: "Bentuk Langsung:", prefix: "Dodi berkata,", suffix: "akan datang esok hari.”", answer: "“Saya" }
+                ],
+                options: ["“Saya", "“Dia", "Dodi", "Bahwa"]
+            },
+            {
+                id: 27,
+                category: "Praktik Mengubah",
+                instruction: "Lengkapi ucapan langsung dari kelompok siswa!",
+                type: "sentence_builder",
+                text: "Kalimat Tidak Langsung: Siswa berkata bahwa mereka siap ujian.",
+                zones: [
+                    { id: "z1", label: "Bentuk Langsung:", prefix: "Siswa berkata,", suffix: "siap ujian.”", answer: "“Kami" }
+                ],
+                options: ["“Kami", "“Mereka", "“Saya", "Bahwa kami"]
+            },
+            {
+                id: 28,
+                category: "Praktik Evaluasi PID",
+                instruction: "Pilih bentuk petikan langsung dengan tanda baca & kapitalisasi sempurna!",
+                type: "sentence_builder",
+                text: "Kalimat Tidak Langsung: Doni berkata bahwa dia senang membantu teman.",
+                zones: [
+                    { id: "z1", label: "Bentuk Langsung:", prefix: "Doni berkata,", suffix: "senang membantu teman.”", answer: "“Saya" }
+                ],
+                options: ["“Saya", "“saya", "bahwa saya", "“Dia"]
+            }
+        ];
+
+        /* ==========================================================================
+           3. GAME ENGINE & PID TOUCH CONTROLLER
+           ========================================================================== */
+        class GameEnginePID {
+            constructor(questions) {
+                this.questions = questions;
+                this.currentIndex = 0;
+                this.score = 0;
+                this.lives = 3;
+                this.correctCount = 0;
+                this.userAnswers = {};
+                this.selectedDraggable = null;
+
+                // DOM Elements
+                this.screenWelcome = document.getElementById('screen-welcome');
+                this.screenGame = document.getElementById('screen-game');
+                this.screenResult = document.getElementById('screen-result');
+                this.statsHeader = document.getElementById('game-stats-header');
+
+                this.scoreText = document.getElementById('score-text');
+                this.livesText = document.getElementById('lives-text');
+                this.progressBar = document.getElementById('progress-bar');
+                this.questionNumber = document.getElementById('question-number');
+                this.badgeCategory = document.getElementById('badge-category');
+                
+                this.questionInstruction = document.getElementById('question-instruction');
+                this.questionText = document.getElementById('question-text');
+                this.dropZonesContainer = document.getElementById('drop-zones-container');
+                this.dragOptionsPool = document.getElementById('drag-options-pool');
+                this.feedbackBox = document.getElementById('feedback-box');
+                this.btnResetOption = document.getElementById('btn-reset-option');
+
+                this.btnStart = document.getElementById('btn-start');
+                this.btnNext = document.getElementById('btn-next');
+                this.btnRestart = document.getElementById('btn-restart');
+                this.audioToggle = document.getElementById('audio-toggle');
+                this.audioIcon = document.getElementById('audio-icon');
+
+                this.bindEvents();
+            }
+
+            bindEvents() {
+                this.btnStart.addEventListener('click', () => this.startGame());
+                this.btnNext.addEventListener('click', () => this.nextQuestion());
+                this.btnRestart.addEventListener('click', () => this.startGame());
+                this.btnResetOption.addEventListener('click', () => this.resetCurrentAnswers());
+
+                this.audioToggle.addEventListener('click', () => {
+                    soundFX.muted = !soundFX.muted;
+                    this.audioIcon.className = soundFX.muted 
+                        ? 'fa-solid fa-volume-xmark text-red-500' 
+                        : 'fa-solid fa-volume-high';
+                });
+            }
+
+            startGame() {
+                this.currentIndex = 0;
+                this.score = 0;
+                this.lives = 3;
+                this.correctCount = 0;
+
+                this.screenWelcome.classList.add('hidden');
+                this.screenResult.classList.add('hidden');
+                this.screenGame.classList.remove('hidden');
+                this.statsHeader.classList.remove('hidden');
+
+                this.loadQuestion();
+            }
+
+            updateStatsUI() {
+                this.scoreText.textContent = this.score;
+                this.livesText.textContent = this.lives;
+                const progress = ((this.currentIndex) / this.questions.length) * 100;
+                this.progressBar.style.width = `${progress}%`;
+                this.questionNumber.textContent = `Soal ${this.currentIndex + 1} / ${this.questions.length}`;
+            }
+
+            loadQuestion() {
+                const q = this.questions[this.currentIndex];
+                this.userAnswers = {};
+                this.selectedDraggable = null;
+                this.feedbackBox.classList.add('hidden');
+
+                this.updateStatsUI();
+                this.badgeCategory.textContent = q.category;
+                this.questionInstruction.textContent = q.instruction;
+                this.questionText.textContent = q.text;
+
+                this.dropZonesContainer.innerHTML = '';
+                this.dragOptionsPool.innerHTML = '';
+
+                // 1. Render PID Drop Zones (Large Touch Box)
+                q.zones.forEach((zone) => {
+                    const zoneEl = document.createElement('div');
+                    zoneEl.className = 'drop-zone bg-white p-5 rounded-3xl border-3 border-dashed border-indigo-300 flex flex-col md:flex-row items-center justify-between gap-4 min-h-[76px] shadow-sm';
+                    zoneEl.dataset.zoneId = zone.id;
+
+                    let labelHTML = '';
+                    if (q.type === 'sentence_builder') {
+                        labelHTML = `
+                            <div class="text-xl md:text-2xl text-gray-800 font-bold leading-relaxed w-full">
+                                ${zone.prefix || ''} 
+                                <span class="drop-target inline-block min-w-[150px] px-4 py-2 bg-indigo-50 border-3 border-indigo-400 border-dashed rounded-2xl text-indigo-700 font-extrabold text-center align-middle mx-2 text-xl md:text-2xl cursor-pointer hover:bg-indigo-100 transition">
+                                    ?
+                                </span> 
+                                ${zone.suffix || ''}
+                            </div>
+                        `;
+                    } else {
+                        labelHTML = `
+                            <div class="w-full">
+                                ${zone.label ? `<p class="text-base md:text-lg font-extrabold text-gray-700 mb-2">${zone.label}</p>` : ''}
+                                <div class="drop-target min-h-[56px] bg-indigo-50/70 border-3 border-indigo-300 border-dashed rounded-2xl p-3 flex items-center justify-center text-indigo-500 font-bold text-lg cursor-pointer hover:bg-indigo-100 transition">
+                                    Geser / Ketuk Jawaban Di Sini
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    zoneEl.innerHTML = labelHTML;
+                    this.setupDropZoneEvents(zoneEl);
+                    this.dropZonesContainer.appendChild(zoneEl);
+                });
+
+                // 2. Render PID Draggable Options (Large Touch Badges)
+                const shuffledOptions = [...q.options].sort(() => Math.random() - 0.5);
+                shuffledOptions.forEach((optText, idx) => {
+                    const optEl = document.createElement('div');
+                    optEl.className = 'draggable-item bg-white px-6 py-3.5 rounded-2xl border-2 border-indigo-200 shadow-md font-extrabold text-indigo-800 hover:bg-indigo-50 active:bg-indigo-100 text-lg md:text-xl flex items-center space-x-3 border-b-4 border-b-indigo-300';
+                    optEl.draggable = true;
+                    optEl.dataset.value = optText;
+                    optEl.dataset.optId = `opt-${idx}`;
+                    optEl.innerHTML = `
+                        <i class="fa-solid fa-grip-vertical text-indigo-300 text-base"></i>
+                        <span>${optText}</span>
+                    `;
+
+                    this.setupDraggableEvents(optEl);
+                    this.dragOptionsPool.appendChild(optEl);
+                });
+            }
+
+            /* ==========================================================================
+               4. DUAL MODE INTERACTION (Drag-Drop & Direct Tap for PID Smart Board)
+               ========================================================================== */
+            setupDraggableEvents(el) {
+                // Drag Events (Desktop & Stylus)
+                el.addEventListener('dragstart', (e) => {
+                    e.dataTransfer.setData('text/plain', el.dataset.value);
+                    e.dataTransfer.setData('opt-id', el.dataset.optId);
+                    el.classList.add('opacity-40');
+                });
+
+                el.addEventListener('dragend', () => {
+                    el.classList.remove('opacity-40');
+                });
+
+                // Tap-to-Select Handler (Extremely handy for PID touchscreens)
+                el.addEventListener('click', () => {
+                    const q = this.questions[this.currentIndex];
+                    // Find first empty zone
+                    const emptyZone = q.zones.find(z => !this.userAnswers[z.id]);
+                    if (emptyZone) {
+                        const zoneEl = this.dropZonesContainer.querySelector(`[data-zone-id="${emptyZone.id}"]`);
+                        if (zoneEl) {
+                            this.handleDrop(zoneEl, el.dataset.value, el);
+                        }
+                    }
+                });
+            }
+
+            setupDropZoneEvents(zoneEl) {
+                zoneEl.addEventListener('dragover', (e) => {
+                    e.preventDefault();
+                    zoneEl.classList.add('drag-over');
+                });
+
+                zoneEl.addEventListener('dragleave', () => {
+                    zoneEl.classList.remove('drag-over');
+                });
+
+                zoneEl.addEventListener('drop', (e) => {
+                    e.preventDefault();
+                    zoneEl.classList.remove('drag-over');
+                    const val = e.dataTransfer.getData('text/plain');
+                    const optId = e.dataTransfer.getData('opt-id');
+                    const optEl = this.dragOptionsPool.querySelector(`[data-opt-id="${optId}"]`) || 
+                                  Array.from(document.querySelectorAll('.draggable-item')).find(i => i.dataset.value === val);
+
+                    if (val && optEl) {
+                        this.handleDrop(zoneEl, val, optEl);
+                    }
+                });
+            }
+
+            handleDrop(zoneEl, value, optEl) {
+                const zoneId = zoneEl.dataset.zoneId;
+                
+                // Store user answer
+                this.userAnswers[zoneId] = value;
+
+                // Update Drop Zone Target UI
+                const targetArea = zoneEl.querySelector('.drop-target');
+                if (targetArea) {
+                    targetArea.textContent = value;
+                    targetArea.className = 'drop-target inline-block px-5 py-2.5 bg-indigo-600 text-white font-extrabold rounded-2xl text-center shadow-lg animate-pulse-ring text-xl md:text-2xl border-2 border-indigo-300';
+                }
+
+                // Hide placed option
+                optEl.classList.add('hidden');
+
+                // Check if all zones in question are filled
+                const q = this.questions[this.currentIndex];
+                const allFilled = q.zones.every(z => this.userAnswers[z.id]);
+
+                if (allFilled) {
+                    this.checkAnswers();
+                }
+            }
+
+            resetCurrentAnswers() {
+                // Reload current question to reset dropped items
+                const q = this.questions[this.currentIndex];
+                if (!this.feedbackBox.classList.contains('hidden')) return; // Don't reset if already submitted
+                this.loadQuestion();
+            }
+
+            /* ==========================================================================
+               5. ANSWER EVALUATION & SOUND FEEDBACK
+               ========================================================================== */
+            checkAnswers() {
+                const q = this.questions[this.currentIndex];
+                let isCorrect = true;
+
+                // Validate each zone answer
+                q.zones.forEach(z => {
+                    if (this.userAnswers[z.id] !== z.answer) {
+                        isCorrect = false;
+                    }
+                });
+
+                // Display Feedback UI & Play Music/Audio
+                this.feedbackBox.classList.remove('hidden', 'bg-emerald-50', 'border-emerald-300', 'bg-rose-50', 'border-rose-300');
+                const feedbackIconBg = document.getElementById('feedback-icon-bg');
+                const feedbackIcon = document.getElementById('feedback-icon');
+                const feedbackTitle = document.getElementById('feedback-title');
+                const feedbackDesc = document.getElementById('feedback-desc');
+
+                if (isCorrect) {
+                    soundFX.playCorrect();
+                    this.score += 10;
+                    this.correctCount++;
+
+                    this.feedbackBox.classList.add('bg-emerald-50', 'border-emerald-400', 'text-emerald-950');
+                    feedbackIconBg.className = 'w-14 h-14 rounded-2xl flex items-center justify-center text-white text-3xl font-black bg-emerald-600 shadow-lg';
+                    feedbackIcon.className = 'fa-solid fa-check';
+                    feedbackTitle.textContent = 'Jawaban Tepat! 🎉';
+                    feedbackDesc.textContent = 'Kamu hebat! Pemahaman konsep kalimatmu sangat tepat.';
+                } else {
+                    soundFX.playWrong();
+                    this.lives = Math.max(0, this.lives - 1);
+
+                    this.feedbackBox.classList.add('bg-rose-50', 'border-rose-400', 'text-rose-950');
+                    feedbackIconBg.className = 'w-14 h-14 rounded-2xl flex items-center justify-center text-white text-3xl font-black bg-rose-600 shadow-lg';
+                    feedbackIcon.className = 'fa-solid fa-xmark';
+                    feedbackTitle.textContent = 'Kurang Tepat!';
+                    
+                    const answersSummary = q.zones.map(z => z.answer).join(', ');
+                    feedbackDesc.textContent = `Jawaban yang benar: "${answersSummary}"`;
+                }
+
+                this.updateStatsUI();
+
+                // Disable option touch interaction after submission
+                const draggables = this.dragOptionsPool.querySelectorAll('.draggable-item');
+                draggables.forEach(d => d.style.pointerEvents = 'none');
+            }
+
+            nextQuestion() {
+                if (this.lives <= 0) {
+                    this.showResults(false);
+                    return;
+                }
+
+                this.currentIndex++;
+                if (this.currentIndex < this.questions.length) {
+                    this.loadQuestion();
+                } else {
+                    this.showResults(true);
+                }
+            }
+
+            /* ==========================================================================
+               6. RESULT SUMMARY & CELEBRATION
+               ========================================================================== */
+            showResults(completed) {
+                soundFX.playWin();
+
+                this.screenGame.classList.add('hidden');
+                this.screenResult.classList.remove('hidden');
+
+                const finalScoreEl = document.getElementById('final-score');
+                const finalAccuracyEl = document.getElementById('final-accuracy');
+                const resultTitle = document.getElementById('result-title');
+                const resultSubtitle = document.getElementById('result-subtitle');
+                const resultIconContainer = document.getElementById('result-icon-container');
+
+                finalScoreEl.textContent = this.score;
+                finalAccuracyEl.textContent = `${this.correctCount} / ${this.questions.length}`;
+
+                const accuracyPercentage = (this.correctCount / this.questions.length) * 100;
+                const stars = document.querySelectorAll('.fa-star');
+
+                stars.forEach((star, index) => {
+                    if ((index === 0 && accuracyPercentage >= 30) ||
+                        (index === 1 && accuracyPercentage >= 70) ||
+                        (index === 2 && accuracyPercentage >= 85)) {
+                        star.className = 'fa-solid fa-star text-amber-400';
+                    } else {
+                        star.className = 'fa-regular fa-star text-gray-300';
+                    }
+                });
+
+                if (accuracyPercentage >= 80) {
+                    resultTitle.textContent = 'Luar Biasa! 🏆';
+                    resultSubtitle.textContent = 'Selamat! Kamu telah menguasai Kalimat Langsung & Tidak Langsung!';
+                    resultIconContainer.className = 'w-28 h-28 rounded-full mx-auto flex items-center justify-center text-5xl mb-6 bg-amber-100 text-amber-500 shadow-xl border-4 border-amber-300';
+                } else if (accuracyPercentage >= 50) {
+                    resultTitle.textContent = 'Bagus Sekali! 👍';
+                    resultSubtitle.textContent = 'Hasil yang baik! Terus berlatih untuk hasil sempurna.';
+                    resultIconContainer.className = 'w-28 h-28 rounded-full mx-auto flex items-center justify-center text-5xl mb-6 bg-blue-100 text-blue-600 shadow-xl border-4 border-blue-300';
+                } else {
+                    resultTitle.textContent = 'Tetap Semangat! 💪';
+                    resultSubtitle.textContent = 'Mari pelajari kembali ringkasan materi dan coba lagi!';
+                    resultIconContainer.className = 'w-28 h-28 rounded-full mx-auto flex items-center justify-center text-5xl mb-6 bg-orange-100 text-orange-600 shadow-xl border-4 border-orange-300';
+                }
+            }
+        }
+
+        // Initialize Game on Window Load
+        window.addEventListener('DOMContentLoaded', () => {
+            window.gamePID = new GameEnginePID(questionBank);
+        });
+    </script>
+</body>
+</html>
